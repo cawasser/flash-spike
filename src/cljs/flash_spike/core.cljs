@@ -40,6 +40,14 @@
    [:img {:src "/img/warning_clojure.png"}]])
 
 
+(defn widget-contents
+  "analogous to (make-chart/make-chart) ?
+   Should change only when the data-source updates"
+
+  [id source]
+  (str id " => " @source))
+
+
 (defn widget
   "analogous to widgets.core/make-widget, but not really.
    This may be where our issue is..."
@@ -48,11 +56,12 @@
   ^{:key (:id w)}
   [:li
    {:on-click #(rf/dispatch [:remove-widget (:id w)])}
-   (str (:id w) " => " @s)])
+   (widget-contents (:id w) s)])
 
 
 (defn widget-setup
   "analogous to (widgets.core/setup-widget)"
+
   [w]
   (let [source (rf/subscribe [:source (:source w)])]
     [widget w source]))
@@ -61,6 +70,7 @@
 (defn widget-list
   "analogous to 'grid'
    Should only re-render on adding/removing a widget"
+
   [widgets]
   [:ul
    (for [w widgets]
@@ -70,6 +80,7 @@
 
 (defn data-source-list
   "analogous to ':data-sources'"
+
   [sources]
   (prn "data-source-list " sources)
   [:div
