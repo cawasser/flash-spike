@@ -105,9 +105,15 @@
         [:button.button {:on-click
                          #(do
                             (rf/dispatch
+                              [:add-widget @next-widget-id :timer])
+                            (swap! next-widget-id inc))}
+         "Add Timer"]
+        [:button.button {:on-click
+                         #(do
+                            (rf/dispatch
                               [:add-widget @next-widget-id :counter])
                             (swap! next-widget-id inc))}
-         "Add Widget"]]
+         "Add Counter"]]
        [:div
         [data-source-list @sources]]])))
 
