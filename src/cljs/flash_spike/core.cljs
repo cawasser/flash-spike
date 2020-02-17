@@ -45,6 +45,7 @@
    Should change only when the data-source updates"
 
   [id source]
+  (prn "widget-contents " id)
   (str id " => " @source))
 
 
@@ -53,6 +54,7 @@
    This may be where our issue is..."
 
   [w s]
+  (prn "widget " (:id w))
   ^{:key (:id w)}
   [:li
    {:on-click #(rf/dispatch [:remove-widget (:id w)])}
@@ -63,6 +65,7 @@
   "analogous to (widgets.core/setup-widget)"
 
   [w]
+  (prn "widget-setup " (:id w))
   (let [source (rf/subscribe [:source (:source w)])]
     [widget w source]))
 
@@ -72,6 +75,7 @@
    Should only re-render on adding/removing a widget"
 
   [widgets]
+  (prn "widget-list " widgets)
   [:ul
    (for [w widgets]
      ^{:key (:id w)}
@@ -82,36 +86,34 @@
   "analogous to ':data-sources'"
 
   [sources]
-  (prn "data-source-list " sources)
+  ;(prn "data-source-list " sources)
   [:div
    (for [[k s] sources]
      (do
-       (prn "source " k "," s)
+       ;(prn "source " k "," s)
        ^{:key (:id s)}
-       [:button.button {:on-click
-                        #(rf/dispatch-sync [:update-source (:id s)])}
+       [:button.button {:on-click #(rf/dispatch-sync [:update-source (:id s)])}
         (str (:id s) " => " (:value s))]))])
 
 
+(defonce next-widget-id (atom 2))
 
 (defn home-page []
   (let [widgets        (rf/subscribe [:widgets])
-        sources        (rf/subscribe [:sources])
-        next-widget-id (atom 2)]
+        sources        (rf/subscribe [:sources])]
+
     (fn []
       [:section.section>div.container>div.content
        [:div
         [widget-list @widgets]
         [:button.button {:on-click
                          #(do
-                            (rf/dispatch
-                              [:add-widget @next-widget-id :timer])
+                            (rf/dispatch [:add-widget @next-widget-id :timer])
                             (swap! next-widget-id inc))}
          "Add Timer"]
         [:button.button {:on-click
                          #(do
-                            (rf/dispatch
-                              [:add-widget @next-widget-id :counter])
+                            (rf/dispatch [:add-widget @next-widget-id :counter])
                             (swap! next-widget-id inc))}
          "Add Counter"]]
        [:div
@@ -158,5 +160,5 @@
   (rf/dispatch-sync [:add-source :timer])
   (rf/dispatch-sync [:add-source :counter])
   (rf/dispatch-sync [:add-widget 0 :timer])
-  ;(rf/dispatch-sync [:add-widget 1 :counter])
+  (rf/dispatch-sync [:add-widget 1 :counter])
   (mount-components))
