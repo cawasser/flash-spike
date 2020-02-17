@@ -36,7 +36,7 @@
                  [selmer "1.12.18"]]
 
   :min-lein-version "2.0.0"
-  
+
   :source-paths ["src/clj" "src/cljs" "src/cljc"]
   :test-paths ["test/clj"]
   :resource-paths ["resources" "target/cljsbuild"]
@@ -48,85 +48,87 @@
   [:target-path [:cljsbuild :builds :app :compiler :output-dir] [:cljsbuild :builds :app :compiler :output-to]]
   :figwheel
   {:http-server-root "public"
-   :server-logfile "log/figwheel-logfile.log"
-   :nrepl-port 7002
-   :css-dirs ["resources/public/css"]
+   :server-logfile   "log/figwheel-logfile.log"
+   :nrepl-port       7002
+   :css-dirs         ["resources/public/css"]
    :nrepl-middleware [cider.piggieback/wrap-cljs-repl]}
-  
+
 
   :profiles
-  {:uberjar {:omit-source true
-             :prep-tasks ["compile" ["cljsbuild" "once" "min"]]
-             :cljsbuild{:builds
-              {:min
-               {:source-paths ["src/cljc" "src/cljs" "env/prod/cljs"]
-                :compiler
-                {:output-dir "target/cljsbuild/public/js"
-                 :output-to "target/cljsbuild/public/js/app.js"
-                 :source-map "target/cljsbuild/public/js/app.js.map"
-                 :optimizations :advanced
-                 :pretty-print false
-                 :infer-externs true
-                 :closure-warnings
-                 {:externs-validation :off :non-standard-jsdoc :off}
-                 :externs ["react/externs/react.js"]}}}}
-             
-             :aot :all
-             :uberjar-name "flash-spike.jar"
-             :source-paths ["env/prod/clj"]
-             :resource-paths ["env/prod/resources"]}
+  {:uberjar       {:omit-source    true
+                   :prep-tasks     ["compile" ["cljsbuild" "once" "min"]]
+                   :cljsbuild      {:builds
+                                    {:min
+                                     {:source-paths ["src/cljc" "src/cljs" "env/prod/cljs"]
+                                      :compiler
+                                                    {:output-dir    "target/cljsbuild/public/js"
+                                                     :output-to     "target/cljsbuild/public/js/app.js"
+                                                     :source-map    "target/cljsbuild/public/js/app.js.map"
+                                                     :optimizations :advanced
+                                                     :pretty-print  false
+                                                     :infer-externs true
+                                                     :closure-warnings
+                                                                    {:externs-validation :off :non-standard-jsdoc :off}
+                                                     :externs       ["react/externs/react.js"]}}}}
+
+                   :aot            :all
+                   :uberjar-name   "flash-spike.jar"
+                   :source-paths   ["env/prod/clj"]
+                   :resource-paths ["env/prod/resources"]}
 
    :dev           [:project/dev :profiles/dev]
    :test          [:project/dev :project/test :profiles/test]
 
-   :project/dev  {:jvm-opts ["-Dconf=dev-config.edn"]
-                  :dependencies [[binaryage/devtools "0.9.11"]
-                                 [cider/piggieback "0.4.2"]
-                                 [doo "0.1.11"]
-                                 [figwheel-sidecar "0.5.19"]
-                                 [pjstadig/humane-test-output "0.10.0"]
-                                 [prone "2019-07-08"]
-                                 [re-frisk "0.5.4.1"]
-                                 [ring/ring-devel "1.8.0"]
-                                 [ring/ring-mock "0.4.0"]]
-                  :plugins      [[com.jakemccrary/lein-test-refresh "0.24.1"]
-                                 [jonase/eastwood "0.3.5"]
-                                 [lein-doo "0.1.11"]
-                                 [lein-figwheel "0.5.19"]]
-                  :cljsbuild{:builds
-                   {:app
-                    {:source-paths ["src/cljs" "src/cljc" "env/dev/cljs"]
-                     :figwheel {:on-jsload "flash-spike.core/mount-components"}
-                     :compiler
-                     {:output-dir "target/cljsbuild/public/js/out"
-                      :closure-defines {"re_frame.trace.trace_enabled_QMARK_" true}
-                      :optimizations :none
-                      :preloads [re-frisk.preload]
-                      :output-to "target/cljsbuild/public/js/app.js"
-                      :asset-path "/js/out"
-                      :source-map true
-                      :main "flash-spike.app"
-                      :pretty-print true}}}}
-                  
-                  
-                  :doo {:build "test"}
-                  :source-paths ["env/dev/clj"]
-                  :resource-paths ["env/dev/resources"]
-                  :repl-options {:init-ns user}
-                  :injections [(require 'pjstadig.humane-test-output)
-                               (pjstadig.humane-test-output/activate!)]}
-   :project/test {:jvm-opts ["-Dconf=test-config.edn"]
-                  :resource-paths ["env/test/resources"]
-                  :cljsbuild 
-                  {:builds
-                   {:test
-                    {:source-paths ["src/cljc" "src/cljs" "test/cljs"]
-                     :compiler
-                     {:output-to "target/test.js"
-                      :main "flash-spike.doo-runner"
-                      :optimizations :whitespace
-                      :pretty-print true}}}}
-                  
-                  }
-   :profiles/dev {}
+   :project/dev   {:jvm-opts       ["-Dconf=dev-config.edn"]
+                   :dependencies   [[binaryage/devtools "0.9.11"]
+                                    [cider/piggieback "0.4.2"]
+                                    [doo "0.1.11"]
+                                    [figwheel-sidecar "0.5.19"]
+                                    [pjstadig/humane-test-output "0.10.0"]
+                                    [prone "2019-07-08"]
+                                    [day8.re-frame/re-frame-10x "0.5.2"]
+                                    [day8.re-frame/tracing "0.5.1"]
+                                    [ring/ring-devel "1.8.0"]
+                                    [ring/ring-mock "0.4.0"]]
+                   :plugins        [[com.jakemccrary/lein-test-refresh "0.24.1"]
+                                    [jonase/eastwood "0.3.5"]
+                                    [lein-doo "0.1.11"]
+                                    [lein-figwheel "0.5.19"]]
+                   :cljsbuild      {:builds
+                                    {:app
+                                     {:source-paths ["src/cljs" "src/cljc" "env/dev/cljs"]
+                                      :figwheel     {:on-jsload "flash-spike.core/mount-components"}
+                                      :compiler
+                                                    {:output-dir      "target/cljsbuild/public/js/out"
+                                                     :closure-defines {"re_frame.trace.trace_enabled_QMARK_" true
+                                                                       "day8.re_frame.tracing.trace_enabled_QMARK_"  true}
+                                                     :optimizations   :none
+                                                     :preloads        [day8.re-frame-10x.preload]
+                                                     :output-to       "target/cljsbuild/public/js/app.js"
+                                                     :asset-path      "/js/out"
+                                                     :source-map      true
+                                                     :main            "flash-spike.app"
+                                                     :pretty-print    true}}}}
+
+
+                   :doo            {:build "test"}
+                   :source-paths   ["env/dev/clj"]
+                   :resource-paths ["env/dev/resources"]
+                   :repl-options   {:init-ns user}
+                   :injections     [(require 'pjstadig.humane-test-output)
+                                    (pjstadig.humane-test-output/activate!)]}
+   :project/test  {:jvm-opts       ["-Dconf=test-config.edn"]
+                   :resource-paths ["env/test/resources"]
+                   :cljsbuild
+                                   {:builds
+                                    {:test
+                                     {:source-paths ["src/cljc" "src/cljs" "test/cljs"]
+                                      :compiler
+                                                    {:output-to     "target/test.js"
+                                                     :main          "flash-spike.doo-runner"
+                                                     :optimizations :whitespace
+                                                     :pretty-print  true}}}}}
+
+
+   :profiles/dev  {}
    :profiles/test {}})

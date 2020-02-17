@@ -15,7 +15,7 @@
 
 (defn nav-link [uri title page]
   [:a.navbar-item
-   {:href   uri
+   {:href  uri
     :class (when (= page @(rf/subscribe [:page])) :is-active)}
    title])
 
@@ -26,9 +26,9 @@
       [:a.navbar-item {:href "/" :style {:font-weight :bold}} "flash-spike"]
       [:span.navbar-burger.burger
        {:data-target :nav-menu
-        :on-click #(swap! expanded? not)
-        :class (when @expanded? :is-active)}
-       [:span][:span][:span]]]
+        :on-click    #(swap! expanded? not)
+        :class       (when @expanded? :is-active)}
+       [:span] [:span] [:span]]]
      [:div#nav-menu.navbar-menu
       {:class (when @expanded? :is-active)}
       [:div.navbar-start
@@ -39,13 +39,51 @@
   [:section.section>div.container>div.content
    [:img {:src "/img/warning_clojure.png"}]])
 
+
+(defn widget [w s]
+  ^{:key (:id w)} [:li (str (:id w) " => " @s)])
+
+
+(defn widget-list [widgets]
+  [:ul
+   (for [w widgets]
+     (let [source (rf/subscribe [:source (:source w)])]
+       [widget w source]))])
+
+
+(defn data-source-list [sources]
+  (prn "data-source-list " sources)
+  [:div
+   (for [[k s] sources]
+     (do
+       (prn "source " k "," s)
+       [:button.button {:on-click
+                        #(rf/dispatch-sync [:update-source (:id s)])}
+        (str (:id s) " => " (:value s))]))])
+
+
+
 (defn home-page []
-  [:section.section>div.container>div.content
-   (when-let [docs @(rf/subscribe [:docs])]
-     [:div {:dangerouslySetInnerHTML {:__html (md->html docs)}}])])
+  (let [widgets        (rf/subscribe [:widgets])
+        sources        (rf/subscribe [:sources])
+        next-widget-id (atom 2)]
+    (fn []
+      [:section.section>div.container>div.content
+       [:div
+        [widget-list @widgets]
+        [:button.button {:on-click
+                         #(do
+                            (rf/dispatch
+                              [:add-widget @next-widget-id :counter])
+                            (swap! next-widget-id inc))}
+         "Add Widget"]]
+       [:div
+        [data-source-list @sources]]])))
+
+
 
 (def pages
-  {:home #'home-page
+  {:home  #'home-page
    :about #'about-page})
 
 (defn page []
@@ -55,7 +93,7 @@
      [page]]))
 
 (defn navigate! [match _]
-  (rf/dispatch [:navigate match]))
+  (rf/dispatch-sync [:navigate match]))
 
 (def router
   (reitit/router
@@ -80,4 +118,8 @@
 (defn init! []
   (start-router!)
   (ajax/load-interceptors!)
+  (rf/dispatch-sync [:add-source :timer])
+  (rf/dispatch-sync [:add-source :counter])
+  (rf/dispatch-sync [:add-widget 0 :timer])
+  ;(rf/dispatch-sync [:add-widget 1 :counter])
   (mount-components))
