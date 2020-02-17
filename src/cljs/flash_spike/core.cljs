@@ -40,23 +40,43 @@
    [:img {:src "/img/warning_clojure.png"}]])
 
 
-(defn widget [w s]
-  ^{:key (:id w)} [:li (str (:id w) " => " @s)])
+(defn widget
+  "analogous to widgets.core/make-widget, but not really.
+   This may be where our issue is..."
+
+  [w s]
+  ^{:key (:id w)}
+  [:li
+   {:on-click #(rf/dispatch [:remove-widget (:id w)])}
+   (str (:id w) " => " @s)])
 
 
-(defn widget-list [widgets]
+(defn widget-setup
+  "analogous to (widgets.core/setup-widget)"
+  [w]
+  (let [source (rf/subscribe [:source (:source w)])]
+    [widget w source]))
+
+
+(defn widget-list
+  "analogous to 'grid'
+   Should only re-render on adding/removing a widget"
+  [widgets]
   [:ul
    (for [w widgets]
-     (let [source (rf/subscribe [:source (:source w)])]
-       [widget w source]))])
+     ^{:key (:id w)}
+     [widget-setup w])])
 
 
-(defn data-source-list [sources]
+(defn data-source-list
+  "analogous to ':data-sources'"
+  [sources]
   (prn "data-source-list " sources)
   [:div
    (for [[k s] sources]
      (do
        (prn "source " k "," s)
+       ^{:key (:id s)}
        [:button.button {:on-click
                         #(rf/dispatch-sync [:update-source (:id s)])}
         (str (:id s) " => " (:value s))]))])

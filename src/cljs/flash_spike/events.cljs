@@ -46,6 +46,11 @@
                           :source source}))))
 
 (rf/reg-event-db
+  :remove-widget
+  (fn-traced [db [_ widget-id]]
+    (assoc db :widgets (filter #(not= widget-id (:id %)) (:widgets db)))))
+
+(rf/reg-event-db
   :add-source
   (fn-traced [db [_ source]]
     (prn ":add-source " source)
